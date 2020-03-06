@@ -80,8 +80,9 @@ scene.onHitTile(SpriteKind.Player, 9, function (sprite) {
     }
 })
 function changing_levels () {
-    if (levelnumber == 3) {
-        info.changeLifeBy(1)
+    info.changeLifeBy(1)
+    if (levelnumber == 2) {
+    	
     }
     if (levelnumber == LevelList.length) {
         game.over(true)
@@ -612,8 +613,8 @@ b b . . . b b b b b . . . . . . . . . . . . . . . . .
 2 . . . . . 2 2 b b 2 2 2 2 2 b 1 b b 1 b . 7 b 1 1 b 
 . . . . 8 . . . 2 b 2 2 2 2 2 b b b b b b . . b 1 1 b 
 . . . . . . . . . 2 2 2 2 2 2 b b b b b b 7 . b b b b 
-. . 7 7 7 7 7 . . . . . . . . . . . . . . . . b 1 1 b 
-b d . . . . . . . . . . . . . . . . . . . . 7 b 1 1 b 
+. d 7 7 7 7 7 . . . . . . . . . . . . . . . . b 1 1 b 
+. . . . . . . . . . . . . . . . . . . . . . 7 b 1 1 b 
 b b b b b b b b . . . . . . . . . . 3 . . . . b b b b 
 b b b b b b b b b . . . . . 3 4 b b b b 4 . 2 b 1 1 b 
 b b b b b b b b b 4 b b b b b b 1 b b 1 b 2 2 b 1 1 b 
