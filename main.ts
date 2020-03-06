@@ -56,10 +56,9 @@ controller.up.onEvent(ControllerButtonEvent.Released, function () {
 `)
     }
 })
-// note:  add ammo count, edit lvels to fit fbla
+// ATM checks cash
 scene.onHitTile(SpriteKind.Player, 9, function (sprite) {
     if (difficulty < 2) {
-        sprite.x += -5
         game.splash("Current balance: " + cashAmount)
         moneyinteraction = game.askForString("¨Deposit¨ or ¨withdraw¨ money? Or ¨no¨.")
         if (moneyinteraction == "deposit") {
@@ -73,6 +72,7 @@ scene.onHitTile(SpriteKind.Player, 9, function (sprite) {
         } else if (moneyinteraction == "no") {
             game.splash("ok")
         }
+        sprite.x += -5
     } else if (difficulty == 2) {
         game.splash("Current balance: " + cashAmount)
         game.splash("ok thats all have fun")
@@ -87,6 +87,9 @@ function changing_levels () {
     levelnumber += 1
     game.splash(Task_List[levelnumber])
     scene.setTileMap(LevelList[levelnumber])
+    if (levelnumber == 3) {
+        info.changeLifeBy(1)
+    }
     CreateCoins()
     for (let value3 of scene.getTilesByType(13)) {
         scene.place(value3, Person)
@@ -283,18 +286,23 @@ e e e e e e e e e e e e e e e e
     }
 }
 function Projectileshot () {
-    if (weaponoption < 4) {
-        Arrays()
-        projectile_animation()
-        pause(100)
-        MyProjectile = sprites.createProjectileFromSprite(Available_weapon_sprites[weaponoption], Person, XVELOCITY, YVELOCITY)
-    } else if (weaponoption == 4) {
-        Arrays()
-        MyProjectile = sprites.createProjectileFromSprite(Available_weapon_sprites[weaponoption], Person, XVELOCITY - 10, YVELOCITY - 0)
-        Projectile4Clone = sprites.createProjectileFromSprite(Available_weapon_sprites[weaponoption], Person, XVELOCITY + 0, YVELOCITY + 10)
-    }
-    if (weaponoption == 2) {
-        MyProjectile.ay = 320
+    if (ammo > 0) {
+        if (weaponoption < 4) {
+            Arrays()
+            projectile_animation()
+            pause(100)
+            MyProjectile = sprites.createProjectileFromSprite(Available_weapon_sprites[weaponoption], Person, XVELOCITY, YVELOCITY)
+        } else if (weaponoption == 4) {
+            Arrays()
+            MyProjectile = sprites.createProjectileFromSprite(Available_weapon_sprites[weaponoption], Person, XVELOCITY - 10, YVELOCITY - 0)
+            Projectile4Clone = sprites.createProjectileFromSprite(Available_weapon_sprites[weaponoption], Person, XVELOCITY + 0, YVELOCITY + 10)
+        }
+        if (weaponoption == 2) {
+            MyProjectile.ay = 320
+        }
+        ammo += -1
+    } else {
+        Person.say("go buy more stuff", 500)
     }
 }
 controller.player2.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Released, function () {
@@ -591,11 +599,11 @@ b b . . . 8 . 8 . 8 . . . . . . b 1 b 1 b 2 2 2 . . 2
 1 b . . . . 7 . 7 . . . . . . 2 b b b b b 2 2 2 . . 2 
 1 b . . . . . . . . . . . . . 2 . . . . . 2 2 2 . 5 2 
 b b . . . . . . . . . 7 . . . . . . . . . . . 2 2 2 2 
-b b . . . b 2 b 2 b . . 8 . . . . . . . . . . . 2 2 2 
+b b . . . b b b b b . . 8 . . . . . . . . . . . 2 2 2 
 1 b . . . b 1 b 1 b . . . 7 . . 8 7 8 7 8 . . . . 2 2 
 1 b . . . b 1 b 1 b . . . . . . . . . . . . . . . . . 
 b b . . . b b b b b . . . . . . . . . . . . . . . . . 
-2 2 2 . . b 1 b 1 b . . . . . 2 b 2 b 2 b b . . . . . 
+2 2 2 . . b 1 b 1 b . . . . . 2 b b b b b b . . . . . 
 2 2 2 2 . b 1 b 1 b . . . . . b b b b b b b . . . . . 
 2 2 2 2 . b b b b b 2 2 2 2 2 b 1 b b 1 b . . . . . . 
 2 2 2 2 2 b b b b b 2 2 2 2 2 b b b b b b . . . . . . 
@@ -605,9 +613,9 @@ b b . . . b b b b b . . . . . . . . . . . . . . . . .
 . . . . 8 . . . 2 b 2 2 2 2 2 b b b b b b . . b 1 1 b 
 . . . . . . . . . 2 2 2 2 2 2 b b b b b b 7 . b b b b 
 . . 7 7 7 7 7 . . . . . . . . . . . . . . . . b 1 1 b 
-b . . . . . . . . . . . . . . . . . . . . . 7 b 1 1 b 
-b . b b b b b b . . . . . . . . . . 3 . . . . b b b b 
-b d b b b b b b b . . . . . 3 4 b b b b 4 . 2 b 1 1 b 
+b d . . . . . . . . . . . . . . . . . . . . 7 b 1 1 b 
+b b b b b b b b . . . . . . . . . . 3 . . . . b b b b 
+b b b b b b b b b . . . . . 3 4 b b b b 4 . 2 b 1 1 b 
 b b b b b b b b b 4 b b b b b b 1 b b 1 b 2 2 b 1 1 b 
 b b b b b b b b b b b b b b b b b b b b b 2 2 b b b b 
 `, img`
@@ -1158,12 +1166,13 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.shop, function (sprite, otherSpr
             cashAmount += -30
             canshoot = true
             damage = 2
-            ammo = 35
+            ammo += 35
             game.splash("You received x35 ducks", "An abundance of ducks")
         } else if (weaponoption == 1 && cashAmount >= 46) {
             cashAmount += -46
             canshoot = true
             damage = 3.5
+            ammo += 25
             game.splash("You received x25 pellets", "Just faster than ducks")
         } else if (weaponoption == 2 && cashAmount >= 69) {
             cashAmount += -69
@@ -1171,19 +1180,19 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.shop, function (sprite, otherSpr
             XVELOCITY = 80
             YVELOCITY = -100
             damage = 8
-            ammo = 18
+            ammo += 18
             game.splash("You received x18 bombs", "Perks: Explodes into 4 pieces")
         } else if (weaponoption == 3 && cashAmount >= 50) {
             cashAmount += -50
             canshoot = true
             damage = 4
-            ammo = 3
+            ammo += 3
             game.splash("You received x3 stars", "Perks: Infinite ammo if you recollect the bits")
         } else if (weaponoption == 4 && cashAmount >= 90) {
             cashAmount += -90
             canshoot = true
             damage = 12
-            ammo = 20
+            ammo += 20
             game.splash("You received x20 coins", "Perks: Pierces enemies")
         } else {
             game.splash("You did not pick 0-4", "Or you are poor")
@@ -2562,7 +2571,6 @@ let Myheight = 0
 let doubleJump = false
 let canjump = false
 let rightanimation = false
-let ammo = 0
 let INVENTORY: Sprite = null
 let canshoot = false
 let Projectile4Clone: Sprite = null
@@ -2571,6 +2579,7 @@ let XVELOCITY = 0
 let Available_weapon_sprites: Image[] = []
 let MyProjectile: Sprite = null
 let weaponoption = 0
+let ammo = 0
 let color_set = 0
 let Task_List: string[] = []
 let LevelList: Image[] = []
