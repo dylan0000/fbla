@@ -80,6 +80,9 @@ scene.onHitTile(SpriteKind.Player, 9, function (sprite) {
     }
 })
 function changing_levels () {
+    if (levelnumber == 3) {
+        info.changeLifeBy(1)
+    }
     if (levelnumber == LevelList.length) {
         game.over(true)
     }
@@ -87,9 +90,6 @@ function changing_levels () {
     levelnumber += 1
     game.splash(Task_List[levelnumber])
     scene.setTileMap(LevelList[levelnumber])
-    if (levelnumber == 3) {
-        info.changeLifeBy(1)
-    }
     CreateCoins()
     for (let value3 of scene.getTilesByType(13)) {
         scene.place(value3, Person)
