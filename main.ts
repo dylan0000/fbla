@@ -30,6 +30,11 @@ namespace myTiles {
 . . . . . . . . . . . . . . . . 
 `
 }
+function clearcoins () {
+    for (let value of sprites.allOfKind(SpriteKind.money)) {
+        value.destroy()
+    }
+}
 controller.up.onEvent(ControllerButtonEvent.Released, function () {
     if (stilltitlescreen == true) {
         if (mouse.y == 70 && mouse.y > 50) {
@@ -79,25 +84,36 @@ scene.onHitTile(SpriteKind.Player, 9, function (sprite) {
         sprite.x += -5
     }
 })
+sprites.onOverlap(SpriteKind.Projectile, SpriteKind.Bosslvl1, function (sprite, otherSprite) {
+    sprite.destroy()
+    MINIBosSHP += damage * -1
+    if (MINIBosSHP <= 0) {
+        otherSprite.destroy()
+        MINIBosSHP = (difficulty + 1) * 30
+        MINIBOSSES += -1
+        info.changeScoreBy(10)
+    }
+    if (weaponoption == 2) {
+        sprite.startEffect(effects.fire)
+        scene.cameraShake(3, 200)
+    } else if (weaponoption == 3) {
+        makebit()
+    }
+})
 function changing_levels () {
+    levelnumber += 1
     if (levelnumber == LevelList.length) {
         game.over(true)
     }
     ClearMap()
     clearcoins()
-    levelnumber += 1
-    if (difficulty == 2) {
-        if (levelnumber == 2) {
-            info.changeLifeBy(1)
-            pause(100)
-        }
-    }
     game.splash(Task_List[levelnumber])
     scene.setTileMap(LevelList[levelnumber])
     CreateCoins()
     for (let value3 of scene.getTilesByType(13)) {
         scene.place(value3, Person)
     }
+    Myheight = Person.y
     make_enemys()
 }
 function tile_wall () {
@@ -318,11 +334,6 @@ controller.player2.onButtonEvent(ControllerButton.Left, ControllerButtonEvent.Re
         }
     }
 })
-function clearcoins () {
-    for (let value of sprites.allOfKind(SpriteKind.money)) {
-        value.destroy()
-    }
-}
 sprites.onOverlap(SpriteKind.Player, SpriteKind.bit, function (sprite, otherSprite) {
     ammo += 1
     otherSprite.destroy()
@@ -403,41 +414,73 @@ b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b b
 . . . . b . 9 4 . . . 3 . . . . 
 d . . . b b b b b b b b b b 2 4 
 `, img`
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-. . . . . . . . . . . . . . . . . . . . . . . . 
-d . . . . . . . . . . . . . . . . . . . . . . . 
-b b b b b b b b b b b b . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . 
+. . . . . 7 . . . . . f . . . . . 
+. . . . b b b . . . . . . . . . . 
+. . . . b 1 2 . . 4 b b b 4 . . . 
+b b . . . . . . . b 1 1 1 b . . . 
+b b . . . . . . . 2 1 1 1 b . . . 
+1 b . . . . . . . 2 1 1 1 b b . 5 
+1 b . . . . . . . 2 b b b b 2 b b 
+b b . . . . . . . . . . . 2 2 2 2 
+1 b . . 8 . 8 . . . . . . . . . . 
+1 b . . b b b . . . . . . . . . . 
+b b . . b 1 b . . . . . . . . . . 
+1 b . . b b b . . . . . . . . . . 
+1 b . . b 1 b . . 8 . 8 . . . . . 
+b b 2 2 b b 4 3 . 4 b b b . . . . 
+2 2 2 2 b 1 b 2 2 b 1 1 b . . . . 
+2 2 2 2 b b b 2 2 b 1 1 b . . . . 
+2 2 2 . 2 2 2 2 2 b b b b . . . . 
+2 2 2 . . . 2 2 2 b b b b . . b b 
+2 . . . . . . 2 2 b 1 1 b . . b 1 
+. . . . . . . . 2 b 1 1 b . . b 1 
+. . . 7 7 . . . . b b b b . . b b 
+. . 7 . . 7 . . . . . . . . . b 1 
+d . . . . . . . . . . . . . . b 1 
+b b b b b 4 . . . 3 . . . . . 4 b 
+b b b b b b b b b b b b b 2 2 b b 
+`, img`
+2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 2 
+2 2 2 2 2 2 2 2 2 2 b b b b b b 2 2 2 2 2 2 2 2 2 2 
+2 2 2 2 2 2 2 2 b b . . . . . . b b 2 2 2 2 2 2 2 2 
+2 2 2 2 2 2 b b . . . . . . . . . . b b 2 2 2 2 2 2 
+2 2 2 2 2 b . . . . . . . . . . . . . . b 2 2 2 2 2 
+2 2 2 2 2 b . . . . . . . . . . . . . . b 2 2 2 2 2 
+2 2 2 2 b . . . . . . . . . . . . . . . . b 2 2 2 2 
+2 2 2 2 b . . . . . . . . . . . . . . . . b 2 2 2 2 
+2 2 2 b . . . . . . . . . . . . . . . . . . b 2 2 2 
+. . 2 b . . . . . . . . . . . . . . . . . . b 2 . . 
+7 . 2 b . . . . . . . . . . . . . . . . . . b 2 . 7 
+. . 2 b . . . . . . . . . . . . . . . . . . b 2 . . 
+. . 2 b . . . . . . . . . . . . . . . . . . b 2 . . 
+. . 2 b . . . . . . . . . . . . . . . . . . b 2 . . 
+. . 2 2 b . . . . . . . . . . . . . . . . b 2 2 . . 
+. . . 2 b . . . . . . . . . . . . . . . . b 2 . . . 
+. . . 2 2 b . . . . . . . . . . . . . . b 2 2 . . . 
+. . . . 2 b . . . . . . . . . . . . . . b 2 . . . . 
+. . . . 2 2 b b . . . . . . . . . . b b 2 2 . . . . 
+. . . . . 2 2 2 b b . . . . . . b b 2 2 2 . . . . . 
+. . . . . . . 2 2 2 b b . . b b 2 2 2 . . . . . . . 
+. . . . . . . . . 2 2 2 . 7 2 2 2 . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . 7 . . . . . . . . . . . . . 
+. . . . . . . . f . . . . . . . . f . . . . . . . . 
+. . . . . . . . . . . . . 7 . . . . . . . . . . . . 
+. . . . . . 4 b b b b 4 . . 4 b b b b 4 . . . . . . 
+. . . . . . . . . . . . 7 . . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . . 7 . . . . . . . . . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . . . . . . . . . 7 . . . . . . . . . . . . . 
+. . . . . . 8 . 8 . 8 . . . . 8 . 8 . 8 . . . . . . 
+. . . . b b b b b b b b . 7 b b b b b b b b . . . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . 
+. . . . 3 . . 3 . . 3 . 7 . . 3 . . 3 . . 3 . . . . 
+. . 4 b b 9 b b b b b 4 . . 4 b b b b b b b b 4 . . 
+. . . . . . . . . . . . . . . . . . . . . . . . . . 
+d . . . . . . . . . . . . . . . . . . . . . . . . . 
+b b b b b b b b b b b b 1 1 b b b b b b b b b b b b 
 `]
     } else if (difficulty == 1) {
         LevelList = [img`
@@ -544,7 +587,7 @@ b b b b b b b b b b b b b b b b b b b b b b . . . . . . . . . . . . . . . . . . 
 . . . . . b 1 b . . . . b 1 b . . b 1 . . 1 b b . . b . b . 2 2 b 1 1 1 1 b . . . . 
 . . . . . b b b . . . . b b b . . b 1 . . 1 b b . . b b b b 2 2 b 1 1 1 1 b . . . . 
 . . . . . b 1 b . . . . b 1 b . . b 1 . . 1 b b . . b 1 1 b 2 2 b b b b b b . . . . 
-. . . f . b b b . . . . b b b . . b 1 . . 1 b b . . b b b b 2 2 b 1 1 1 1 b . . . . 
+. . . . . b b b . . . . b b b . . b 1 . . 1 b b . . b b b b 2 2 b 1 1 1 1 b . . . . 
 . . . . . b 1 b . . . . b 1 b . . b b . . b b b . . b 1 1 b 2 2 b 1 1 1 1 b . . . . 
 d . 7 7 . b b b . . . . b b b . b b b . . b b b . . b b b b 2 2 b 1 1 1 1 b . . . . 
 b b b b b b b b . . . . b b b 7 9 b b . . b b b . . b 1 1 b 2 2 b b b b b 7 . . . . 
@@ -675,6 +718,9 @@ controller.down.onEvent(ControllerButtonEvent.Pressed, function () {
 . . . . . f f . . . f f . . . . 
 `)
     }
+})
+sprites.onOverlap(SpriteKind.Player, SpriteKind.Bosslvl1, function (sprite, otherSprite) {
+    DamagedPlayer()
 })
 controller.B.onEvent(ControllerButtonEvent.Pressed, function () {
     if (canshoot == true) {
@@ -1167,45 +1213,54 @@ scene.onHitTile(SpriteKind.Player, 0, function (sprite) {
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.shop, function (sprite, otherSprite) {
     BUY = game.askForString("want to buy something? ¨yes¨ or ¨no¨")
-    if (BUY == "yes") {
-        game.splash("Balance: " + cashAmount)
-        game.showLongText("Options available: rubber ducks for $30, pellets for $46, bombs for $69, stars for $50, and coins for $90. Note that these come in a pack of 25 ", DialogLayout.Full)
-        weaponoption = game.askForNumber("0.duck 1.pellet 2.bomb 3.star 4.coin")
-        if (weaponoption == 0 && cashAmount >= 30) {
-            cashAmount += -30
-            canshoot = true
-            damage = 2
-            ammo += 35
-            game.splash("You received x35 ducks", "An abundance of ducks")
-        } else if (weaponoption == 1 && cashAmount >= 46) {
-            cashAmount += -46
-            canshoot = true
-            damage = 3.5
-            ammo += 25
-            game.splash("You received x25 pellets", "Just faster than ducks")
-        } else if (weaponoption == 2 && cashAmount >= 69) {
-            cashAmount += -69
-            canshoot = true
-            XVELOCITY = 80
-            YVELOCITY = -100
-            damage = 8
-            ammo += 18
-            game.splash("You received x18 bombs", "Perks: Explodes into 4 pieces")
-        } else if (weaponoption == 3 && cashAmount >= 50) {
-            cashAmount += -50
-            canshoot = true
-            damage = 4
-            ammo += 3
-            game.splash("You received x3 stars", "Perks: Infinite ammo if you recollect the bits")
-        } else if (weaponoption == 4 && cashAmount >= 90) {
-            cashAmount += -90
-            canshoot = true
-            damage = 12
-            ammo += 20
-            game.splash("You received x20 coins", "Perks: Pierces enemies")
-        } else {
-            game.splash("You did not pick 0-4", "Or you are poor")
+    if (ammo <= Bought_Ammo / 3) {
+        if (BUY == "yes") {
+            game.splash("Balance: " + cashAmount)
+            game.showLongText("Options available: rubber ducks for $30, pellets for $46, bombs for $69, stars for $50, and coins for $90. Note that these come in a pack of 25 ", DialogLayout.Full)
+            weaponoption = game.askForNumber("0.duck 1.pellet 2.bomb 3.star 4.coin")
+            if (weaponoption == 0 && cashAmount >= 30) {
+                cashAmount += -30
+                canshoot = true
+                damage = 2
+                ammo += 36
+                Bought_Ammo = ammo
+                game.splash("You received x36 ducks", "An abundance of ducks")
+            } else if (weaponoption == 1 && cashAmount >= 46) {
+                cashAmount += -46
+                canshoot = true
+                damage = 3.5
+                ammo += 24
+                Bought_Ammo = ammo
+                game.splash("You received x24 pellet", "Just better than ducks")
+            } else if (weaponoption == 2 && cashAmount >= 69) {
+                cashAmount += -69
+                canshoot = true
+                XVELOCITY = 80
+                YVELOCITY = -100
+                damage = 8
+                ammo += 18
+                Bought_Ammo = ammo
+                game.splash("You received x18 bombs", "Perks: Explodes into 4 pieces")
+            } else if (weaponoption == 3 && cashAmount >= 50) {
+                cashAmount += -50
+                canshoot = true
+                damage = 4
+                ammo += 3
+                Bought_Ammo = ammo
+                game.splash("You received x3 stars", "Perks: Infinite ammo if you recollect the bits")
+            } else if (weaponoption == 4 && cashAmount >= 90) {
+                cashAmount += -90
+                canshoot = true
+                damage = 12
+                ammo += 12
+                Bought_Ammo = ammo
+                game.splash("You received x12 coins")
+            } else {
+                game.splash("You did not pick 0-4", "Or you are poor")
+            }
         }
+    } else {
+        game.splash("You already own something", "with more than 30% ammo")
     }
     Person.x += 5
 })
@@ -1237,7 +1292,7 @@ function Player2 () {
 `, SpriteKind.Player)
         Person.ay = 350
         scene.cameraFollowSprite(Person)
-        controller.moveSprite(Person, 110, 0)
+        controller.moveSprite(Person, 115, 0)
     } else if (difficulty == 1) {
         info.setLife(4)
         Person = sprites.create(img`
@@ -1309,8 +1364,32 @@ scene.onHitTile(SpriteKind.Player, 5, function (sprite) {
     changing_levels()
 })
 function Arrays () {
-    Task_List = ["Goal 1: Preparation", "Goal 2: Climb tower", "Goal 3:"]
+    Task_List = ["Goal 1: Preparation", "Goal 2: Climb tower", "Goal 3: Kill a mini boss", "Goal 4: Live"]
     // rubber duck cost for 1 = $10
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     //
     //
     //
@@ -1356,7 +1435,55 @@ function Arrays () {
     //
     //
     //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     // pellet cost for 1 = $16
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     //
     //
     //
@@ -1402,6 +1529,30 @@ function Arrays () {
     //
     //
     //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     // bomb cost for 1 = $26
     //
     //
@@ -1425,7 +1576,55 @@ function Arrays () {
     //
     //
     //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     // damage = 8
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     //
     //
     //
@@ -1479,6 +1678,38 @@ function Arrays () {
     //
     //
     //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     // damage = 4
     //
     //
@@ -1502,7 +1733,63 @@ function Arrays () {
     //
     //
     //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     // coin cost for 1 = $33
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
+    //
     //
     //
     //
@@ -1941,8 +2228,7 @@ scene.onHitWall(SpriteKind.Projectile, function (sprite) {
     }
 })
 scene.onHitTile(SpriteKind.Player, 2, function (sprite) {
-    scene.placeOnRandomTile(Person, 13)
-    info.changeLifeBy(-1)
+    DamagedPlayer()
 })
 sprites.onOverlap(SpriteKind.bit, SpriteKind.Enemy, function (sprite, otherSprite) {
     sprite.destroy()
@@ -1957,19 +2243,22 @@ sprites.onOverlap(SpriteKind.bit, SpriteKind.Enemy, function (sprite, otherSprit
 })
 // clears all remains
 function ClearMap () {
-    for (let value of sprites.allOfKind(SpriteKind.Enemy)) {
-        value.destroy()
+    for (let value4 of sprites.allOfKind(SpriteKind.Enemy)) {
+        value4.destroy()
     }
     for (let value5 of sprites.allOfKind(SpriteKind.passive_enemy)) {
         value5.destroy()
     }
-    for (let value of sprites.allOfKind(SpriteKind.shop)) {
-        value.destroy()
+    for (let value6 of sprites.allOfKind(SpriteKind.shop)) {
+        value6.destroy()
     }
+    for (let value7 of sprites.allOfKind(SpriteKind.Bosslvl1)) {
+        value7.destroy()
+    }
+    makeShop()
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.Enemy, function (sprite, otherSprite) {
-    info.changeLifeBy(-1)
-    scene.placeOnRandomTile(sprite, 13)
+    DamagedPlayer()
 })
 controller.right.onEvent(ControllerButtonEvent.Pressed, function () {
     if (stilltitlescreen == true) {
@@ -1991,8 +2280,16 @@ scene.onHitWall(SpriteKind.bit, function (sprite) {
     ammo += 1
 })
 sprites.onOverlap(SpriteKind.Player, SpriteKind.passive_enemy, function (sprite, otherSprite) {
-    info.changeLifeBy(-1)
-    scene.placeOnRandomTile(sprite, 13)
+    DamagedPlayer()
+})
+// moving enemy
+scene.onHitTile(SpriteKind.Bosslvl1, 4, function (sprite) {
+    sprite.vx = sprite.vx * -1
+})
+scene.onHitTile(SpriteKind.Player, 1, function (sprite) {
+    if (true) {
+        Person.vy = -400
+    }
 })
 function make_enemys () {
     for (let value52 of scene.getTilesByType(3)) {
@@ -2024,7 +2321,7 @@ function make_enemys () {
         robot.ay = 300
         scene.place(value52, robot)
     }
-    for (let value6 of scene.getTilesByType(8)) {
+    for (let value62 of scene.getTilesByType(8)) {
         bouncer = sprites.create(img`
 . . . . . . . . . . . . . . . . 
 . . . . . . . . . . . . . . . . 
@@ -2051,10 +2348,10 @@ function make_enemys () {
 . . . . . . . . . . d . . . . . 
 . . . . . . . d d d . . . . . . 
 `, SpriteKind.passive_enemy)
-        bouncer.ay = 350
-        scene.place(value6, bouncer)
+        bouncer.ay = 300
+        scene.place(value62, bouncer)
     }
-    for (let value of scene.getTilesByType(15)) {
+    for (let value8 of scene.getTilesByType(15)) {
         Mini_Boss = sprites.create(img`
 . . . . . . . . . . . . . . . . . . . . . . . . 
 . . . . . . . . . . . . . . . . . . . . . . . . 
@@ -2162,9 +2459,10 @@ function make_enemys () {
         true
         )
         Mini_Boss.vx = 30
-        bouncer.ay = 350
-        check_enemy_count += 1
-        scene.place(value, Mini_Boss)
+        Mini_Boss.ay = 350
+        MINIBosSHP = (difficulty + 1) * 30
+        MINIBOSSES += 1
+        scene.place(value8, Mini_Boss)
     }
 }
 sprites.onOverlap(SpriteKind.Player, SpriteKind.money, function (sprite, otherSprite) {
@@ -2336,6 +2634,11 @@ function Title_Screen () {
 `, SpriteKind.cursor)
     mouse.setPosition(45, 50)
 }
+function DamagedPlayer () {
+    info.changeLifeBy(-1)
+    scene.placeOnRandomTile(Person, 13)
+    Myheight = Person.y
+}
 scene.onHitWall(SpriteKind.passive_enemy, function (sprite) {
     sprite.vy = -200
 })
@@ -2408,7 +2711,39 @@ function SET () {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 // -Damage for weapons
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2438,7 +2773,39 @@ function SET () {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 // -Limit for weapon amount (x25)
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2468,7 +2835,39 @@ function SET () {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 // -harder difficulty
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2498,7 +2897,39 @@ function SET () {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 // -(done
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2528,7 +2959,39 @@ function SET () {
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 // finish levels too
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -2571,11 +3034,10 @@ let check_enemy_count = 0
 let enemy_HP = 0
 let pieces_list: Image[] = []
 let piece: Sprite = null
-let damage = 0
+let Bought_Ammo = 0
 let BUY = ""
 let COIN: Sprite = null
 let merchant: Sprite = null
-let Myheight = 0
 let doubleJump = false
 let canjump = false
 let rightanimation = false
@@ -2586,12 +3048,16 @@ let YVELOCITY = 0
 let XVELOCITY = 0
 let Available_weapon_sprites: Image[] = []
 let MyProjectile: Sprite = null
-let weaponoption = 0
 let ammo = 0
 let color_set = 0
+let Myheight = 0
 let Task_List: string[] = []
 let LevelList: Image[] = []
 let levelnumber = 0
+let weaponoption = 0
+let MINIBOSSES = 0
+let damage = 0
+let MINIBosSHP = 0
 let BANKaccount = 0
 let moneyinteraction = ""
 let difficulty = 0
