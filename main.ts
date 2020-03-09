@@ -338,6 +338,19 @@ sprites.onOverlap(SpriteKind.Player, SpriteKind.bit, function (sprite, otherSpri
     ammo += 1
     otherSprite.destroy()
 })
+scene.onHitTile(SpriteKind.Player, 11, function (sprite) {
+    if (canjump == false) {
+        Person.vy = 0
+        doubleJump = true
+    }
+    if (Person.isHittingTile(CollisionDirection.Bottom)) {
+        if (Person.y > Myheight + 80) {
+            info.changeLifeBy(-1)
+            scene.cameraShake(3, 200)
+        }
+    }
+    Myheight = Person.y
+})
 function Change_projectile_speed () {
     if (weaponoption < 2 || weaponoption > 2) {
         if (XVELOCITY == 100) {
@@ -950,17 +963,7 @@ function projectile_animation () {
     }
 }
 scene.onHitWall(SpriteKind.Player, function (sprite) {
-    if (canjump == false) {
-        Person.vy = 0
-        doubleJump = true
-    }
-    if (Person.isHittingTile(CollisionDirection.Bottom)) {
-        if (Person.y > Myheight + 80) {
-            info.changeLifeBy(-1)
-            scene.cameraShake(3, 200)
-        }
-    }
-    Myheight = Person.y
+	
 })
 controller.down.onEvent(ControllerButtonEvent.Released, function () {
     if (stilltitlescreen == true) {
@@ -2288,7 +2291,7 @@ scene.onHitTile(SpriteKind.Bosslvl1, 4, function (sprite) {
 })
 scene.onHitTile(SpriteKind.Player, 1, function (sprite) {
     if (true) {
-        Person.vy = -400
+        Person.vy = -500
     }
 })
 function make_enemys () {
@@ -3025,6 +3028,19 @@ info.onLifeZero(function () {
     info.setScore(0)
     make_enemys()
 })
+scene.onHitTile(SpriteKind.Player, 4, function (sprite) {
+    if (canjump == false) {
+        Person.vy = 0
+        doubleJump = true
+    }
+    if (Person.isHittingTile(CollisionDirection.Bottom)) {
+        if (Person.y > Myheight + 80) {
+            info.changeLifeBy(-1)
+            scene.cameraShake(3, 200)
+        }
+    }
+    Myheight = Person.y
+})
 let Mini_Boss: Sprite = null
 let bouncer: Sprite = null
 let enemyspeed_variable = 0
@@ -3038,9 +3054,9 @@ let Bought_Ammo = 0
 let BUY = ""
 let COIN: Sprite = null
 let merchant: Sprite = null
+let rightanimation = false
 let doubleJump = false
 let canjump = false
-let rightanimation = false
 let INVENTORY: Sprite = null
 let canshoot = false
 let Projectile4Clone: Sprite = null
